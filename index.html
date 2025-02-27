@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Sales Platform</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: sans-serif; background-color: #1e1e1e; color: #fff; }
+    .login-page { display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .login-card { background: #333; padding: 20px; border-radius: 10px; width: 300px; text-align: center; }
+    .login-card img { max-width: 250px; height: auto; margin: 10px auto 20px; padding: 10px; display: block; }
+    .login-card input { width: 100%; padding: 10px; margin: 10px 0; }
+    .login-card button { padding: 10px; background: #f7b91c; border: none; border-radius: 5px; cursor: pointer; }
+    .dashboard-container { display: none; }
+    .sidebar { width: 220px; background: #292929; padding: 20px; height: 100vh; float: left; }
+    .sidebar img { max-width: 180px; height: auto; margin: 0 auto 20px; padding: 0 20px; display: block; }
+    .sidebar ul { list-style: none; padding: 0; }
+    .sidebar ul li { margin: 15px 0; }
+    .sidebar ul li a { color: #fff; text-decoration: none; padding: 10px; display: block; border-radius: 4px; }
+    .sidebar ul li a.active, .sidebar ul li a:hover { background: #f7b91c; color: #1e1e1e; }
+    .sidebar button { background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px; width: 100%; }
+    .main-content { margin-left: 240px; padding: 20px; }
+    .header-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    #kpiTiles { display: flex; flex-wrap: wrap; gap: 25px; margin-top: 30px; }
+    .tile.marketing { background: #2a2a2a; padding: 18px; border-radius: 8px; flex: 1 1 220px; text-align: center; box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3); border: 2px solid #4CAF50; }
+    .tile.sales { background: #2a2a2a; padding: 18px; border-radius: 8px; flex: 1 1 220px; text-align: center; box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3); border: 2px solid #2196F3; }
+    .tile span.label { font-size: 20px; font-weight: normal; }
+    .tile span.value { font-size: 24px; font-weight: bold; }
+    #achievementsContainer { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 40px; }
+    .achievement-card { background: #2a2a2a; padding: 20px; border-radius: 10px; width: 180px; text-align: center; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); border: 1px solid #f7b91c; }
+    .achievement-card img { max-width: 140px; height: auto; border-radius: 6px; margin-bottom: 10px; }
+    .achievement-card span.label { font-size: 16px; font-weight: normal; }
+    .achievement-card span.progress { font-size: 22px; font-weight: bold; }
+    .achievement-card .achievement-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+    .progress-text { font-size: 16px; margin-bottom: 5px; color: #fff; }
+    .progress-bar-container { margin-top: 10px; margin-bottom: 5px; }
+    .progress-bar { height: 20px; background: #333; border-radius: 10px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: #f7b91c; transition: width 0.3s ease; }
+    .next-level { font-size: 16px; color: #ccc; margin-top: 5px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th { font-size: 18px; font-weight: bold; background: #e6a519; padding: 14px; border: 1px solid #444; text-align: center; color: #fff; }
+    td { padding: 14px; border: 1px solid #444; font-size: 15px; text-align: center; }
+    tr:nth-child(even) { background: #333; }
+    tr:hover { background: #2d2d2d; outline: 1px solid #f7b91c; transition: background 0.2s, outline 0.2s; }
+    td span.value { font-size: 18px; font-weight: bold; }
+    td img { max-width: 20px; height: auto; vertical-align: middle; margin-right: 5px; }
+    #toast { position: fixed; bottom: 20px; right: 20px; background: #333; padding: 10px; border-radius: 4px; display: none; }
+    @media (max-width: 768px) {
+      .sidebar { width: 100%; height: auto; position: relative; padding: 10px; }
+      .main-content { margin-left: 0; }
+      #kpiTiles .tile, #achievementsContainer .achievement-card { flex: 1 1 100%; }
+      table th, table td { font-size: 14px; padding: 8px; }
+      #reportsTab form { padding-left: 0; }
+      #reportsTab .script-block { font-size: 14px; }
+      .achievement-card { width: 140px; padding: 15px; }
+      .achievement-card img { max-width: 100px; }
+      .progress-text, .next-level { font-size: 14px; }
+      .progress-bar { height: 15px; border-radius: 8px; }
+    }
+    #timeframeFilter, select[aria-label="Select Leaderboard Timeframe"] {
+      font-size: 16px; padding: 8px 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 4px; color: #fff;
+      outline: none; cursor: pointer; max-width: 200px; margin: 0 auto; display: block;
+    }
+    #timeframeFilter:hover, select[aria-label="Select Leaderboard Timeframe"]:hover {
+      background: #333; outline: 2px solid #f7b91c; transform: scale(1.05); transition: transform 0.2s, background 0.2s, outline 0.2s;
+    }
+    #timeframeFilter:focus, select[aria-label="Select Leaderboard Timeframe"]:focus {
+      outline: 2px solid #f7b91c;
+    }
+    #reportsTab { margin-top: 20px; }
+    #reportsTab h3 { font-size: 18px; margin-bottom: 10px; }
+    #reportsTab .script-block { font-size: 16px; margin-bottom: 20px; padding: 12px; background: #2d2d2d; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); }
+    #reportsTab .script-type { font-weight: bold; font-size: 18px; }
+    #reportsTab .script-item { margin-left: 20px; }
+    #reportsTab .script-text { margin-top: 10px; color: #fff; }
+    #reportsTab .performance { color: #f7b91c; }
+    #reportsTab p { margin-bottom: 0; }
+    #reportsTab hr { border: 1px solid #444; margin: 15px 0; }
+    #reportsTab p strong { font-weight: bold; font-size: 18px; }
+    #reportsTab form { margin-left: 0; padding-left: 20px; padding-right: 20px; }
+    #reportsTab input, #reportsTab select { font-size: 18px; padding: 14px; margin: 12px 0; width: 100%; background: #333; border: 1px solid #444; border-radius: 4px; color: #fff; }
+    #reportsTab input:valid, #reportsTab select:valid { font-weight: bold; }
+    #reportsTab input:focus, #reportsTab select:focus { outline: 3px solid #f7b91c; background: #2d2d2d; }
+    #reportsTab input:hover, #reportsTab select:hover { background: #2d2d2d; transform: scale(1.02); transition: transform 0.2s, background 0.2s; }
+    #reportsTab button { font-size: 18px; padding: 14px 24px; background: #f7b91c; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px; }
+    #reportsTab button:hover { background: #e6a519; transform: scale(1.05); transition: transform 0.2s, background 0.2s; }
+    #reportsTab button:active { background: #d99a0a; }
+    th, td { width: auto; }
+    th:nth-child(1), td:nth-child(1) { width: 10%; }
+    th:nth-child(2), td:nth-child(2) { width: 40%; }
+    th:nth-child(3), td:nth-child(3) { width: 30%; }
+    th:nth-child(4), td:nth-child(4) { width: 20%; }
+  </style>
+</head>
+<body>
+  <div id="loginPage" class="login-page">
+    <div class="login-card">
+      <img src="http://127.0.0.1:5500/images/Logo.png" alt="Goal Assist Logo">
+      <form id="loginForm">
+        <input type="text" id="userIdInput" placeholder="SalesRep ID">
+        <input type="password" id="passwordInput" placeholder="Password">
+        <button type="button" onclick="App.login()">Login</button>
+      </form>
+      <p id="loginError" style="color:red; display:none;">Invalid Credentials</p>
+    </div>
+  </div>
+
+  <div id="dashboardContainer" class="dashboard-container">
+    <div class="sidebar">
+      <img src="http://127.0.0.1:5500/images/Logo.png" alt="Goal Assist Logo">
+      <ul>
+        <li><a href="#" class="nav-link active" data-tab="dashboardTab">Dashboard</a></li>
+        <li><a href="#" class="nav-link" data-tab="leaderboardsTab">Leaderboards</a></li>
+        <li><a href="#" class="nav-link" data-tab="reportsTab">Reports</a></li>
+      </ul>
+      <button onclick="App.logout()">Logout</button>
+    </div>
+
+    <div class="main-content">
+      <div class="header-info">
+        <div>
+          <h2>Welcome, <span id="userName"></span></h2>
+        </div>
+        <div>
+          Account Balance: £<span id="accountBalance">0.00</span> |
+          Next Payment in <span id="nextPaymentCountdown">0</span> days
+        </div>
+      </div>
+
+      <div id="dashboardTab" class="tab-content" style="display:block;">
+        <h1>Dashboard Overview</h1>
+        <select id="timeframeFilter" onchange="App.updateDashboardAndProgressBars(this.value)" aria-label="Select Timeframe">
+          <option value="all">All Time</option>
+          <option value="weekly">Last 7 Days</option>
+          <option value="monthly">Last 30 Days</option>
+          <option value="yearly">Last 365 Days</option>
+        </select>
+        <div id="kpiTiles">
+          <div class="tile marketing">Marketing Posts: <span class="label"></span><span class="value" id="numMarketingPosts">0</span></div>
+          <div class="tile marketing">Total Engagement: <span class="label"></span><span class="value" id="totalEngagement">0</span></div>
+          <div class="tile marketing">Engagement per Post: <span class="label"></span><span class="value" id="engagementPerPost">0</span></div>
+          <div class="tile sales">Outreach Attempts: <span class="label"></span><span class="value" id="numOutreachAttempts">0</span></div>
+          <div class="tile sales">Successful Sales: <span class="label"></span><span class="value" id="numSuccessfulSales">0</span></div>
+          <div class="tile sales">Conversion Rate (Overall): <span class="label"></span><span class="value" id="conversionRateOverall">0%</span></div>
+          <div class="tile sales">Conversion Rate (Cold): <span class="label"></span><span class="value" id="conversionRateCold">0%</span></div>
+          <div class="tile sales">Conversion Rate (Warm): <span class="label"></span><span class="value" id="conversionRateWarm">0%</span></div>
+          <div class="tile sales">Commission Earned: £<span class="label"></span><span class="value" id="commissionEarned">0.00</span></div>
+        </div>
+        <div id="achievementsContainer"></div>
+      </div>
+
+      <div id="leaderboardsTab" class="tab-content" style="display:none;">
+        <h1>Leaderboards</h1>
+        <select onchange="App.updateLeaderboards(this.value)" aria-label="Select Leaderboard Timeframe">
+          <option value="all">All Time</option>
+          <option value="weekly">Last 7 Days</option>
+          <option value="monthly">Last 30 Days</option>
+          <option value="yearly">Last 365 Days</option>
+        </select>
+        <h3 style="font-size: 22px; font-weight: bold; margin-top: 20px; padding-bottom: 5px;">Individual Leaderboard</h3>
+        <table id="individualLeaderboard">
+          <thead><tr><th>Rank</th><th>Name (University)</th><th>Total Revenue</th><th>Sales</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <h3 style="font-size: 22px; font-weight: bold; margin-top: 30px; padding-bottom: 5px;">University Leaderboard</h3>
+        <table id="universityLeaderboard">
+          <thead><tr><th>Rank</th><th>University</th><th>Total Revenue</th><th>Sales</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="reportsTab" class="tab-content" style="display:none;">
+        <div>
+          <h3 style="margin-top: 20px;">Active Scripts</h3>
+          <div class="script-block">
+            <span class="script-type">Cold Script </span>
+            <div class="script-item">S001C</div>
+            <div class="script-item performance">Conversion: 0.98%, Number of outreaches per sale: 113</div>
+            <div class="script-text">Hi [Lead Name], I hope you're doing well. My name is [X], and I'm a X-year student at X University, currently studying [X] and building my football industry network. I recently joined Goal Assist's Football Business Community, and I think it could be a great opportunity for you too. It's a space where football professionals and aspiring industry leaders connect, learn, and share insights. [Insert Link] There are loads of great people involved, and it's been really valuable for me already. If you're interested, I've got a referral code that saves you 10% on membership: [Your Cold Discount Code] Even if you don’t want to join the full community, the code also works for any individual courses you might want to check out. Let me know if you have any questions—would be great to have you in there! Best, [X]</div>
+            <div class="script-item" style="margin-top: 10px;">
+              <span class="script-type">Cold Discount Code: </span><span id="coldDiscountCode"></span>
+              <div class="script-text">Use this code for Cold leads to offer a 10% discount. Share it with your referrals!</div>
+            </div>
+          </div>
+          <hr>
+          <div class="script-block">
+            <span class="script-type">Warm Script </span>
+            <div class="script-item">S003W</div>
+            <div class="script-item performance">Conversion: 0.63%, Number of outreaches per sale: 160</div>
+            <div class="script-text">Hi [Lead Name], I hope you're doing well. Thanks for [liking/commenting/sharing] my post about [topic of post]! I recently joined Goal Assist's Football Business Community, and I think it could be a great opportunity for you too. It's a space where football professionals and aspiring industry leaders connect, learn, and share insights. [Insert Link] There are loads of great people involved, and it's been really valuable for me already. If you're interested, I've got a referral code that saves you 10% on membership: [Your Warm Discount Code] Even if you don’t want to join the full community, the code also works for any individual courses you might want to check out. Let me know if you have any questions—would be great to have you in there! Best, [X]</div>
+            <div class="script-item" style="margin-top: 10px;">
+              <span class="script-type">Warm Discount Code: </span><span id="warmDiscountCode"></span>
+              <div class="script-text">Use this code for Warm leads to offer a 10% discount. Share it with your referrals!</div>
+            </div>
+          </div>
+        </div>
+        <form id="reportForm" onsubmit="App.submitReport(event); return false;">
+          <h3>Marketing Post</h3>
+          <input type="text" id="postLink" name="postLink" placeholder="Post Link">
+          <input type="number" id="postEngagement" name="postEngagement" placeholder="Engagement" min="0">
+          <h3>Sales Outreach</h3>
+          <input type="number" id="outreachAttempts" name="outreachAttempts" placeholder="Outreach Attempts" min="0">
+          <select id="outreachScript" name="outreachScript" aria-label="Select Outreach Script"></select>
+          <button type="submit">Submit Report</button>
+        </form>
+        <p id="reportStatus"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    const dataCache = {};
+    let currentUserId = null;
+    let currentUser = null;
+
+    function clearCache() { Object.keys(dataCache).forEach(key => delete dataCache[key]); }
+
+    async function fetchData(sheetName) {
+      if (dataCache[sheetName]) return dataCache[sheetName];
+      const baseUrl = "https://docs.google.com/spreadsheets/d/1yUVlLOrT6GJRkFuA8BK8ISh0RKMniypon8bVcV_XHwo/gviz/tq?";
+      const url = `${baseUrl}sheet=${sheetName}&tqx=out:json`;
+      try {
+        const res = await fetch(url);
+        const txt = await res.text();
+        const json = JSON.parse(txt.substring(47).slice(0, -2));
+        console.log(`Fetched ${sheetName} Data:`, JSON.stringify(json, null, 2));
+        dataCache[sheetName] = json;
+        return json;
+      } catch (e) {
+        console.error(`Error fetching ${sheetName}:`, e);
+        return null;
+      }
+    }
+
+    async function getDateRange(timeframe) {
+      let now = new Date("2025-02-25");
+      const paydayData = await fetchData("Payday");
+      if (paydayData?.table?.rows[0]?.c[0]?.v) {
+        const dateStr = paydayData.table.rows[0].c[0].v;
+        if (dateStr.startsWith("Date(")) {
+          const match = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+          if (match) now = new Date(match[1], match[2], match[3]);
+        } else {
+          const parts = dateStr.split("/");
+          now = new Date(parts[2], parts[1] - 1, parts[0]);
+        }
+      }
+      let startDate;
+      if (timeframe === "weekly") startDate = new Date(now - 7 * 24 * 60 * 60 * 1000);
+      else if (timeframe === "monthly") startDate = new Date(now - 30 * 24 * 60 * 60 * 1000);
+      else if (timeframe === "yearly") startDate = new Date(now - 365 * 24 * 60 * 60 * 1000);
+      else startDate = new Date(0);
+      return { start: startDate, end: now };
+    }
+
+    async function updateDashboardMetrics(timeframe) {
+      const dateRange = await getDateRange(timeframe);
+      console.log(`Date Range for ${timeframe}: Start=${dateRange.start}, End=${dateRange.end}`);
+      const userData = await fetchData("UserDetails");
+      const user = userData?.table?.rows.find(row => row.c[0]?.v === currentUserId);
+      currentUser = {
+        Name: user?.c[1]?.v,
+        University: user?.c[4]?.v,
+        Balance: user?.c[16]?.v || 0,
+        ColdDiscountCode: user?.c[9]?.v || "No Code",
+        WarmDiscountCode: user?.c[10]?.v || "No Code"
+      };
+      console.log("Current User:", currentUser);
+
+      const marketingData = await fetchData("MarketingLog_Raw");
+      let posts = 0, engagement = 0;
+      if (marketingData?.table?.rows) {
+        marketingData.table.rows.forEach(row => {
+          if (row.c[0]?.v === currentUserId) {
+            const dateStr = row.c[3]?.v;
+            let d;
+            if (dateStr.startsWith("Date(")) {
+              const match = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+              if (match) d = new Date(match[1], match[2], match[3]);
+            } else {
+              const parts = dateStr.split("/");
+              d = new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            if (d >= dateRange.start && d <= dateRange.end) {
+              posts++;
+              engagement += parseInt(row.c[5]?.v) || 0;
+            }
+          }
+        });
+      }
+      document.getElementById("numMarketingPosts").textContent = posts;
+      document.getElementById("totalEngagement").textContent = engagement;
+      document.getElementById("engagementPerPost").textContent = posts > 0 ? (engagement / posts).toFixed(2) : "0";
+
+      const outreachData = await fetchData("SalesOutreach_Raw");
+      let outreachAttempts = 0, coldAttempts = 0, warmAttempts = 0;
+      if (outreachData?.table?.rows) {
+        outreachData.table.rows.forEach(row => {
+          if (row.c[1]?.v === currentUserId) {
+            const dateStr = row.c[0]?.v;
+            let d;
+            if (dateStr.startsWith("Date(")) {
+              const match = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+              if (match) d = new Date(match[1], match[2], match[3]);
+            } else {
+              const parts = dateStr.split("/");
+              d = new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            if (d >= dateRange.start && d <= dateRange.end) {
+              const attempts = parseInt(row.c[4]?.v) || 0;
+              outreachAttempts += attempts;
+              if (row.c[6]?.v.toLowerCase() === "cold") coldAttempts += attempts;
+              else if (row.c[6]?.v.toLowerCase() === "warm") warmAttempts += attempts;
+            }
+          }
+        });
+      }
+      document.getElementById("numOutreachAttempts").textContent = outreachAttempts;
+
+      const transactionData = await fetchData("Transaction_Log");
+      let successfulSales = 0, coldSales = 0, warmSales = 0;
+      if (transactionData?.table?.rows) {
+        transactionData.table.rows.forEach(row => {
+          if (row.c[1]?.v.toLowerCase() === "sale" && row.c[6]?.v === currentUserId) {
+            const dateStr = row.c[0]?.v;
+            let d;
+            if (dateStr.startsWith("Date(")) {
+              const match = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+              if (match) d = new Date(match[1], match[2], match[3]);
+            } else {
+              const parts = dateStr.split("/");
+              d = new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            if (d >= dateRange.start && d <= dateRange.end) {
+              successfulSales++;
+              const outreachType = row.c[9]?.v?.toLowerCase();
+              if (outreachType === "cold") coldSales++;
+              else if (outreachType === "warm") warmSales++;
+            }
+          }
+        });
+      }
+      document.getElementById("numSuccessfulSales").textContent = successfulSales;
+      const overallConversionRate = outreachAttempts > 0 ? ((successfulSales / outreachAttempts) * 100).toFixed(2) + "%" : "0%";
+      document.getElementById("conversionRateOverall").textContent = overallConversionRate;
+      document.getElementById("conversionRateCold").textContent = coldAttempts ? ((coldSales / coldAttempts) * 100).toFixed(2) + "%" : "0%";
+      document.getElementById("conversionRateWarm").textContent = warmAttempts ? ((warmSales / warmAttempts) * 100).toFixed(2) + "%" : "0%";
+
+      let commission = 0;
+      if (transactionData?.table?.rows) {
+        transactionData.table.rows.forEach(row => {
+          if (row.c[6]?.v === currentUserId) {
+            const dateStr = row.c[0]?.v;
+            let d;
+            if (dateStr.startsWith("Date(")) {
+              const match = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+              if (match) d = new Date(match[1], match[2], match[3]);
+            } else {
+              const parts = dateStr.split("/");
+              d = new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            if (d >= dateRange.start && d <= dateRange.end) {
+              const commissionValue = parseFloat(row.c[13]?.v) || 0;
+              if (commissionValue > 0) commission += commissionValue;
+            }
+          }
+        });
+      }
+      document.getElementById("commissionEarned").textContent = commission.toFixed(2);
+    }
+
+    async function updateAchievements() {
+      const achievementsData = await fetchData("Achievements");
+      const marketingData = await fetchData("MarketingLog_Raw");
+      const transactionData = await fetchData("Transaction_Log");
+      const outreachData = await fetchData("SalesOutreach_Raw");
+      const captainData = await fetchData("Captain");
+
+      let stats = { MAP: 0, ENG: 0, SAO: 0, NSM: 0, SAR: 0, CAP: 0 };
+      if (marketingData?.table?.rows) {
+        marketingData.table.rows.forEach(row => {
+          if (row.c[0]?.v === currentUserId) {
+            const dateStr = row.c[3]?.v;
+            let d;
+            if (dateStr.startsWith("Date(")) {
+              const match = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+              if (match) d = new Date(match[1], match[2], match[3]);
+            } else {
+              const parts = dateStr.split("/");
+              d = new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            if (d <= new Date("2025-02-25")) {
+              stats.MAP++;
+              stats.ENG += parseInt(row.c[5]?.v) || 0;
+            }
+          }
+        });
+      }
+      if (outreachData?.table?.rows) {
+        outreachData.table.rows.forEach(row => {
+          if (row.c[1]?.v === currentUserId) {
+            const dateStr = row.c[0]?.v;
+            let d;
+            if (dateStr.startsWith("Date(")) {
+              const match = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+              if (match) d = new Date(match[1], match[2], match[3]);
+            } else {
+              const parts = dateStr.split("/");
+              d = new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            if (d <= new Date("2025-02-25")) {
+              stats.SAO += parseInt(row.c[4]?.v) || 0;
+            }
+          }
+        });
+      }
+      if (transactionData?.table?.rows) {
+        transactionData.table.rows.forEach(row => {
+          if (row.c[1]?.v.toLowerCase() === "sale" && row.c[6]?.v === currentUserId) {
+            const dateStr = row.c[0]?.v;
+            let d;
+            if (dateStr.startsWith("Date(")) {
+              const match = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+              if (match) d = new Date(match[1], match[2], match[3]);
+            } else {
+              const parts = dateStr.split("/");
+              d = new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            if (d <= new Date("2025-02-25")) {
+              stats.NSM++;
+              stats.SAR += parseFloat(row.c[2]?.v) || 0;
+            }
+          }
+        });
+      }
+      if (captainData?.table?.rows) {
+        stats.CAP = captainData?.table?.rows?.filter(row => row.c[2]?.v === currentUserId).length || 0;
+      }
+
+      const container = document.getElementById("achievementsContainer");
+      container.innerHTML = "";
+      const achievementCategories = ["MAP", "ENG", "SAO", "NSM", "SAR", "CAP"];
+      achievementCategories.forEach(category => {
+        const achievements = achievementsData?.table?.rows.filter(row => row.c[0]?.v.startsWith(category));
+        achievements?.sort((a, b) => (parseInt(a.c[3]?.v) || 0) - (parseInt(b.c[3]?.v) || 0));
+        let lastAchieved = null;
+        for (let ach of achievements) {
+          const criteria = parseInt(ach.c[3]?.v) || 0;
+          if (stats[category] >= criteria) lastAchieved = ach;
+          else break;
+        }
+        const card = document.createElement("div");
+        card.className = "achievement-card";
+        let imageUrl = "";
+        let title = "";
+        let progressHtml = "";
+
+        if (category === "CAP") {
+          if (lastAchieved) {
+            title = lastAchieved.c[1]?.v;
+            const currentProgress = stats[category];
+            const nextAchievement = achievements[achievements.indexOf(lastAchieved) + 1];
+            const nextCriteria = nextAchievement ? parseInt(nextAchievement.c[3]?.v) || 0 : "Max";
+            const nextTitle = nextAchievement ? nextAchievement.c[1]?.v : "Max Level";
+            const progressPercent = nextCriteria === "Max" ? 100 : Math.min(100, (currentProgress / nextCriteria) * 100);
+
+            const achievementId = lastAchieved.c[0]?.v;
+            imageUrl = `http://127.0.0.1:5500/images/${achievementId}.png`;
+            if (!imageUrl.includes("CAP")) {
+              imageUrl = `http://127.0.0.1:5500/images/CAPX.png`;
+            }
+
+            progressHtml = `
+              <div class="progress-text">${currentProgress}/${nextCriteria}</div>
+              <div class="progress-bar-container">
+                <div class="progress-bar">
+                  <div class="progress-bar-fill" style="width: ${progressPercent}%;"></div>
+                </div>
+              </div>
+              <div class="next-level">${nextTitle}</div>`;
+          } else if (achievements && achievements.length > 0) {
+            title = `${category}: Unachieved`;
+            const firstAchievementId = achievements[0].c[0]?.v;
+            const xAchievementId = firstAchievementId.replace(/001$/, "X");
+            imageUrl = `http://127.0.0.1:5500/images/${xAchievementId}.png`;
+            const currentProgress = stats[category];
+            const nextCriteria = parseInt(achievements[0].c[3]?.v) || 0;
+            const nextTitle = achievements[0].c[1]?.v || "First Level";
+            const progressPercent = Math.min(100, (currentProgress / nextCriteria) * 100);
+
+            progressHtml = `
+              <div class="progress-text">${currentProgress}/${nextCriteria}</div>
+              <div class="progress-bar-container">
+                <div class="progress-bar">
+                  <div class="progress-bar-fill" style="width: ${progressPercent}%;"></div>
+                </div>
+              </div>
+              <div class="next-level">${nextTitle}</div>`;
+          } else {
+            title = `${category}: Unachieved`;
+            imageUrl = "http://127.0.0.1:5500/images/placeholder.png";
+            progressHtml = `
+              <div class="progress-text">${stats[category]}/N/A</div>
+              <div class="progress-bar-container">
+                <div class="progress-bar">
+                  <div class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="next-level">N/A</div>`;
+          }
+          card.innerHTML = `
+            <span class="achievement-title">${title}</span><br>
+            <img src="${imageUrl}" alt="${title}" style="max-width:140px;"><br>
+            ${progressHtml}`;
+        } else {
+          if (lastAchieved) {
+            const achievementId = lastAchieved.c[0]?.v;
+            title = lastAchieved.c[1]?.v;
+            imageUrl = `http://127.0.0.1:5500/images/${achievementId}.png`;
+            const currentProgress = stats[category];
+            const nextAchievement = achievements[achievements.indexOf(lastAchieved) + 1];
+            const nextCriteria = nextAchievement ? parseInt(nextAchievement.c[3]?.v) || 0 : "Max";
+            const nextTitle = nextAchievement ? nextAchievement.c[1]?.v : "Max Level";
+            const progressPercent = nextCriteria === "Max" ? 100 : Math.min(100, (currentProgress / nextCriteria) * 100);
+
+            progressHtml = `
+              <div class="progress-text">${currentProgress}/${nextCriteria}</div>
+              <div class="progress-bar-container">
+                <div class="progress-bar">
+                  <div class="progress-bar-fill" style="width: ${progressPercent}%;"></div>
+                </div>
+              </div>
+              <div class="next-level">${nextTitle}</div>`;
+          } else if (achievements && achievements.length > 0) {
+            const firstAchievementId = achievements[0].c[0]?.v;
+            const xAchievementId = firstAchievementId.replace(/001$/, "X");
+            title = `${category}: Unachieved`;
+            imageUrl = `http://127.0.0.1:5500/images/${xAchievementId}.png`;
+            const currentProgress = stats[category];
+            const nextCriteria = parseInt(achievements[0].c[3]?.v) || 0;
+            const nextTitle = achievements[0].c[1]?.v || "First Level";
+            const progressPercent = Math.min(100, (currentProgress / nextCriteria) * 100);
+
+            progressHtml = `
+              <div class="progress-text">${currentProgress}/${nextCriteria}</div>
+              <div class="progress-bar-container">
+                <div class="progress-bar">
+                  <div class="progress-bar-fill" style="width: ${progressPercent}%;"></div>
+                </div>
+              </div>
+              <div class="next-level">${nextTitle}</div>`;
+          } else {
+            title = `${category}: Unachieved`;
+            imageUrl = "http://127.0.0.1:5500/images/placeholder.png";
+            progressHtml = `
+              <div class="progress-text">${stats[category]}/N/A</div>
+              <div class="progress-bar-container">
+                <div class="progress-bar">
+                  <div class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="next-level">N/A</div>`;
+          }
+          card.innerHTML = `
+            <span class="achievement-title">${title}</span><br>
+            <img src="${imageUrl}" alt="${title}" style="max-width:140px;"><br>
+            ${progressHtml}`;
+        }
+        container.appendChild(card);
+      });
+
+      const paydayData = await fetchData("Payday");
+      let today = new Date("2025-02-25");
+      if (paydayData?.table?.rows[0]?.c[0]?.v) {
+        const dateStr = paydayData.table.rows[0].c[0].v;
+        if (dateStr.startsWith("Date(")) {
+          const match = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+          if (match) today = new Date(match[1], match[2], match[3]);
+        } else {
+          const parts = dateStr.split("/");
+          today = new Date(parts[2], parts[1] - 1, parts[0]);
+        }
+      }
+
+      const captainDataForStatus = await fetchData("Captain");
+      let isActiveCaptain = false;
+      if (captainDataForStatus?.table?.rows) {
+        const userCaptainEntries = captainDataForStatus.table.rows.filter(row => row.c[2]?.v === currentUserId);
+        if (userCaptainEntries.length > 0) {
+          userCaptainEntries.sort((a, b) => {
+            const dateA = new Date(a.c[0]?.v.startsWith("Date(") ? 
+              a.c[0]?.v.match(/Date\((\d+),(\d+),(\d+)\)/)?.slice(1,4).map(Number) : 
+              a.c[0]?.v.split("/").map((part, i) => i === 1 ? parseInt(part) - 1 : parseInt(part)));
+            const dateB = new Date(b.c[0]?.v.startsWith("Date(") ? 
+              b.c[0]?.v.match(/Date\((\d+),(\d+),(\d+)\)/)?.slice(1,4).map(Number) : 
+              b.c[0]?.v.split("/").map((part, i) => i === 1 ? parseInt(part) - 1 : parseInt(part)));
+            return dateB - dateA;
+          });
+          const latestCaptaincy = userCaptainEntries[0];
+          let startDate, endDate;
+          if (latestCaptaincy.c[0]?.v.startsWith("Date(")) {
+            const startMatch = latestCaptaincy.c[0]?.v.match(/Date\((\d+),(\d+),(\d+)\)/);
+            if (startMatch) startDate = new Date(startMatch[1], startMatch[2], startMatch[3]);
+          } else {
+            const startParts = latestCaptaincy.c[0]?.v.split("/");
+            startDate = new Date(startParts[2], startParts[1] - 1, startParts[0]);
+          }
+          if (latestCaptaincy.c[1]?.v.startsWith("Date(")) {
+            const endMatch = latestCaptaincy.c[1]?.v.match(/Date\((\d+),(\d+),(\d+)\)/);
+            if (endMatch) endDate = new Date(endMatch[1], endMatch[2], endMatch[3]);
+          } else {
+            const endParts = latestCaptaincy.c[1]?.v.split("/");
+            endDate = new Date(endParts[2], endParts[1] - 1, endParts[0]);
+          }
+          const oneWeekAfterEnd = new Date(endDate);
+          oneWeekAfterEnd.setDate(endDate.getDate() + 7);
+          isActiveCaptain = today >= startDate && today <= oneWeekAfterEnd;
+          console.log("Active Captain Check - Today:", today, "Start:", startDate, "End:", endDate, "One Week After End:", oneWeekAfterEnd, "Is Active:", isActiveCaptain);
+        }
+      }
+
+      const captainStatusCard = document.createElement("div");
+      captainStatusCard.className = "achievement-card";
+      const captainStatusImage = isActiveCaptain ? "http://127.0.0.1:5500/images/CAPYES.png" : "http://127.0.0.1:5500/images/CAPNO.png";
+      captainStatusCard.innerHTML = `
+        <span class="achievement-title">Captain’s Armband</span><br>
+        <img src="${captainStatusImage}" alt="Captain’s Armband ${isActiveCaptain ? 'Active' : 'Inactive'}" style="max-width:140px;"><br>
+        <span class="progress">${isActiveCaptain ? "Active" : "Inactive"}</span>`;
+      container.appendChild(captainStatusCard);
+
+      // Update discount codes on Reports tab
+      if (document.getElementById("coldDiscountCode")) {
+        document.getElementById("coldDiscountCode").textContent = currentUser.ColdDiscountCode;
+      }
+      if (document.getElementById("warmDiscountCode")) {
+        document.getElementById("warmDiscountCode").textContent = currentUser.WarmDiscountCode;
+      }
+    }
+
+    async function updateLeaderboards(timeframe) {
+      const dateRange = await getDateRange(timeframe);
+      const transactionData = await fetchData("Transaction_Log");
+      const userData = await fetchData("UserDetails");
+      let leaderboard = {};
+      if (transactionData?.table?.rows) {
+        transactionData.table.rows.forEach(row => {
+          if (row.c[1]?.v.toLowerCase() === "sale") {
+            const dateStr = row.c[0]?.v;
+            let d;
+            if (dateStr.startsWith("Date(")) {
+              const match = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+              if (match) d = new Date(match[1], match[2], match[3]);
+            } else {
+              const parts = dateStr.split("/");
+              d = new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            if (d >= dateRange.start && d <= dateRange.end) {
+              const id = row.c[6]?.v;
+              if (!leaderboard[id]) {
+                const user = userData?.table?.rows.find(u => u.c[0]?.v === id);
+                leaderboard[id] = { Name: user?.c[1]?.v, Uni: user?.c[4]?.v, Revenue: 0, Sales: 0 };
+              }
+              leaderboard[id].Revenue += parseFloat(row.c[2]?.v) || 0;
+              leaderboard[id].Sales++;
+            }
+          }
+        });
+      }
+      let individuals = Object.entries(leaderboard).map(([id, data]) => ({ id, ...data }));
+      individuals.sort((a, b) => b.Revenue - a.Revenue);
+      let tbody = document.getElementById("individualLeaderboard").querySelector("tbody");
+      tbody.innerHTML = individuals.map((i, index) => {
+        let icon = '';
+        if (index === 0) icon = '<img src="http://127.0.0.1:5500/images/trophy.png" alt="Trophy" style="max-width: 20px; height: auto; vertical-align: middle; margin-right: 5px;" onerror="this.outerHTML=\'🏆\'">';
+        if (i.id === currentUserId) icon += '<img src="http://127.0.0.1:5500/images/user.png" alt="Current User" style="max-width: 20px; height: auto; vertical-align: middle; margin-right: 5px;" onerror="this.outerHTML=\'👤\'">';
+        return `<tr><td>${index + 1}</td><td>${icon}${i.Name} (${i.Uni})</td><td>£<span class="value">${i.Revenue.toFixed(2)}</span></td><td><span class="value">${i.Sales}</span></td></tr>`;
+      }).join("");
+
+      let uniBoard = {};
+      individuals.forEach(i => {
+        if (!uniBoard[i.Uni]) uniBoard[i.Uni] = { Revenue: 0, Sales: 0 };
+        uniBoard[i.Uni].Revenue += i.Revenue;
+        uniBoard[i.Uni].Sales += i.Sales;
+      });
+      let unis = Object.entries(uniBoard).map(([uni, data]) => ({ Uni: uni, ...data }));
+      unis.sort((a, b) => b.Revenue - a.Revenue);
+      tbody = document.getElementById("universityLeaderboard").querySelector("tbody");
+      tbody.innerHTML = unis.map((u, index) => {
+        let icon = '';
+        if (index === 0) icon = '<img src="http://127.0.0.1:5500/images/trophy.png" alt="Trophy" style="max-width: 20px; height: auto; vertical-align: middle; margin-right: 5px;" onerror="this.outerHTML=\'🏆\'">';
+        return `<tr><td>${index + 1}</td><td>${icon}${u.Uni}</td><td>£<span class="value">${u.Revenue.toFixed(2)}</span></td><td><span class="value">${u.Sales}</span></td></tr>`;
+      }).join("");
+    }
+
+    async function populateOutreachScripts() {
+      const scriptsData = await fetchData("OutreachScripts");
+      const select = document.getElementById("outreachScript");
+      select.innerHTML = '<option value="">Select Outreach Script</option>';
+      const now = new Date("2025-02-25");
+      if (scriptsData?.table?.rows && currentUser) {
+        scriptsData.table.rows.forEach(row => {
+          const startStr = row.c[0]?.v;
+          const endStr = row.c[1]?.v;
+          let start, end;
+          if (startStr?.startsWith("Date(")) {
+            const startMatch = startStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+            if (startMatch) start = new Date(startMatch[1], startMatch[2], startMatch[3]);
+          }
+          if (endStr?.startsWith("Date(")) {
+            const endMatch = endStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+            if (endMatch) end = new Date(endMatch[1], endMatch[2], endMatch[3]);
+          }
+          if (row.c[3]?.v === currentUser.University && now >= start && now <= end) {
+            const option = document.createElement("option");
+            option.value = row.c[4]?.v;
+            option.textContent = `${row.c[5]?.v}: ${row.c[4]?.v}`;
+            select.appendChild(option);
+
+            if (row.c[5]?.v.toLowerCase() === "cold") {
+              document.querySelector("#reportsTab .script-block:nth-child(2) .script-type").textContent = "Cold Script";
+              document.querySelector("#reportsTab .script-block:nth-child(2) .script-item:nth-child(2)").textContent = row.c[4]?.v;
+              document.querySelector("#reportsTab .script-block:nth-child(2) .performance").textContent = `Conversion: ${((parseFloat(row.c[9]?.v) || 0) * 100).toFixed(2)}%, Number of outreaches per sale: ${((parseFloat(row.c[9]?.v) || 0) > 0 ? Math.round(1 / (parseFloat(row.c[9]?.v) || 0)) : 0)}`;
+              document.querySelector("#reportsTab .script-block:nth-child(2) .script-text").textContent = row.c[6]?.v;
+            } else if (row.c[5]?.v.toLowerCase() === "warm") {
+              document.querySelector("#reportsTab .script-block:nth-child(3) .script-type").textContent = "Warm Script";
+              document.querySelector("#reportsTab .script-block:nth-child(3) .script-item:nth-child(2)").textContent = row.c[4]?.v;
+              document.querySelector("#reportsTab .script-block:nth-child(3) .performance").textContent = `Conversion: ${((parseFloat(row.c[9]?.v) || 0) * 100).toFixed(2)}%, Number of outreaches per sale: ${((parseFloat(row.c[9]?.v) || 0) > 0 ? Math.round(1 / (parseFloat(row.c[9]?.v) || 0)) : 0)}`;
+              document.querySelector("#reportsTab .script-block:nth-child(3) .script-text").textContent = row.c[6]?.v;
+            }
+          }
+        });
+      }
+    }
+
+    async function submitReport(event) {
+      event.preventDefault();
+      const postLink = document.getElementById("postLink").value;
+      const postEngagement = document.getElementById("postEngagement").value;
+      const outreachAttempts = document.getElementById("outreachAttempts").value;
+      const scriptId = document.getElementById("outreachScript").value;
+      const date = new Date("2025-02-25").toLocaleDateString("en-GB");
+      const report = {
+        Marketing: postLink ? { SalesRep_ID: currentUserId, Name: currentUser.Name, Uni: currentUser.University, Date: date, Post_Link: postLink, Engagement: postEngagement } : null,
+        Outreach: outreachAttempts ? { Date: date, SalesRep_ID: currentUserId, Name: currentUser.Name, Uni: currentUser.University, Outreach: outreachAttempts, Script_ID: scriptId } : null
+      };
+      console.log("Report:", report);
+
+      try {
+        const response = await fetch("https://hook.eu2.make.com/p13wmn6mopsvqjfvrms1jwehh5e5k36u", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(report)
+        });
+        const responseText = await response.text();
+        console.log("Webhook Response Status:", response.status, "Body:", responseText);
+
+        if (response.ok) {
+          showToast("Report submitted successfully.");
+          document.getElementById("reportForm").reset();
+          document.getElementById("reportStatus").textContent = "Report submitted.";
+          await Promise.all([updateDashboardMetrics("all"), updateAchievements()]);
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
+        }
+      } catch (error) {
+        console.error("Error sending to webhook:", error);
+        showToast("Failed to submit report. Please try again.");
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.style.display = "block";
+      setTimeout(() => toast.style.display = "none", 3000);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const loginForm = document.getElementById("loginForm");
+      if (loginForm) {
+        loginForm.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            App.login();
+          }
+        });
+      }
+    });
+
+    document.querySelectorAll(".nav-link").forEach(link => {
+      link.addEventListener("click", function(e) {
+        e.preventDefault();
+        document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
+        this.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(tab => tab.style.display = "none");
+        document.getElementById(this.dataset.tab).style.display = "block";
+      });
+    });
+
+    const App = {
+      login: async () => {
+        const id = document.getElementById("userIdInput").value.trim();
+        const pass = document.getElementById("passwordInput").value.trim();
+        console.log("Attempting login with ID:", id, "Password:", pass);
+        
+        try {
+          const userData = await fetchData("UserDetails");
+          console.log("UserDetails Data:", userData?.table?.rows);
+          const user = userData?.table?.rows.find(row => row.c[0]?.v === id && row.c[8]?.v.trim() === pass);
+          if (user) {
+            currentUserId = id;
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("dashboardContainer").style.display = "block";
+            document.getElementById("userName").textContent = user.c[1]?.v;
+            document.getElementById("accountBalance").textContent = (user.c[16]?.v || 0).toFixed(2);
+            
+            const paydayData = await fetchData("Payday");
+            let daysTillPayday = 0;
+            if (paydayData?.table?.rows[0]?.c[2]) {
+              const rawValue = paydayData?.table?.rows[0]?.c[2]?.v;
+              if (rawValue !== undefined && rawValue !== null) {
+                daysTillPayday = parseInt(rawValue.toString().trim(), 10) || 0;
+              }
+            }
+            document.getElementById("nextPaymentCountdown").textContent = daysTillPayday || "0";
+
+            await updateDashboardMetrics("all");
+            await updateAchievements();
+            await updateLeaderboards("all");
+            await populateOutreachScripts();
+            clearCache();
+          } else {
+            document.getElementById("loginError").textContent = "Invalid Credentials or Network Error. Please try again.";
+            document.getElementById("loginError").style.display = "block";
+          }
+        } catch (error) {
+          console.error("Login error:", error);
+          document.getElementById("loginError").textContent = "Network error, please try again.";
+          document.getElementById("loginError").style.display = "block";
+        }
+      },
+      logout: () => {
+        currentUserId = null;
+        currentUser = null;
+        clearCache();
+        document.getElementById("dashboardContainer").style.display = "none";
+        document.getElementById("loginPage").style.display = "flex";
+        document.getElementById("userIdInput").value = "";
+        document.getElementById("passwordInput").value = "";
+      },
+      updateDashboardAndProgressBars: (timeframe) => Promise.all([updateDashboardMetrics(timeframe), updateAchievements()]),
+      updateLeaderboards,
+      populateOutreachScripts,
+      updateAchievements,
+      submitReport,
+      showToast
+    };
+
+    window.App = App;
+    App.init = () => clearCache();
+    App.init();
+  </script>
+</body>
+</html>
