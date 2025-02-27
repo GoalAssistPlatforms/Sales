@@ -96,7 +96,7 @@
 <body>
   <div id="loginPage" class="login-page">
     <div class="login-card">
-      <img src="http://127.0.0.1:5500/images/Logo.png" alt="Goal Assist Logo">
+      <img src="Logo.png" alt="Goal Assist Logo">
       <form id="loginForm">
         <input type="text" id="userIdInput" placeholder="SalesRep ID">
         <input type="password" id="passwordInput" placeholder="Password">
@@ -108,7 +108,7 @@
 
   <div id="dashboardContainer" class="dashboard-container">
     <div class="sidebar">
-      <img src="http://127.0.0.1:5500/images/Logo.png" alt="Goal Assist Logo">
+      <img src="Logo.png" alt="Goal Assist Logo">
       <ul>
         <li><a href="#" class="nav-link active" data-tab="dashboardTab">Dashboard</a></li>
         <li><a href="#" class="nav-link" data-tab="leaderboardsTab">Leaderboards</a></li>
@@ -468,9 +468,9 @@
             const progressPercent = nextCriteria === "Max" ? 100 : Math.min(100, (currentProgress / nextCriteria) * 100);
 
             const achievementId = lastAchieved.c[0]?.v;
-            imageUrl = `http://127.0.0.1:5500/images/${achievementId}.png`;
+            imageUrl = `${achievementId}.png`;
             if (!imageUrl.includes("CAP")) {
-              imageUrl = `http://127.0.0.1:5500/images/CAPX.png`;
+              imageUrl = `CAPX.png`;
             }
 
             progressHtml = `
@@ -485,7 +485,7 @@
             title = `${category}: Unachieved`;
             const firstAchievementId = achievements[0].c[0]?.v;
             const xAchievementId = firstAchievementId.replace(/001$/, "X");
-            imageUrl = `http://127.0.0.1:5500/images/${xAchievementId}.png`;
+            imageUrl = `${xAchievementId}.png`;
             const currentProgress = stats[category];
             const nextCriteria = parseInt(achievements[0].c[3]?.v) || 0;
             const nextTitle = achievements[0].c[1]?.v || "First Level";
@@ -501,7 +501,7 @@
               <div class="next-level">${nextTitle}</div>`;
           } else {
             title = `${category}: Unachieved`;
-            imageUrl = "http://127.0.0.1:5500/images/placeholder.png";
+            imageUrl = "placeholder.png";
             progressHtml = `
               <div class="progress-text">${stats[category]}/N/A</div>
               <div class="progress-bar-container">
@@ -519,7 +519,7 @@
           if (lastAchieved) {
             const achievementId = lastAchieved.c[0]?.v;
             title = lastAchieved.c[1]?.v;
-            imageUrl = `http://127.0.0.1:5500/images/${achievementId}.png`;
+            imageUrl = `${achievementId}.png`;
             const currentProgress = stats[category];
             const nextAchievement = achievements[achievements.indexOf(lastAchieved) + 1];
             const nextCriteria = nextAchievement ? parseInt(nextAchievement.c[3]?.v) || 0 : "Max";
@@ -538,7 +538,7 @@
             const firstAchievementId = achievements[0].c[0]?.v;
             const xAchievementId = firstAchievementId.replace(/001$/, "X");
             title = `${category}: Unachieved`;
-            imageUrl = `http://127.0.0.1:5500/images/${xAchievementId}.png`;
+            imageUrl = `${xAchievementId}.png`;
             const currentProgress = stats[category];
             const nextCriteria = parseInt(achievements[0].c[3]?.v) || 0;
             const nextTitle = achievements[0].c[1]?.v || "First Level";
@@ -554,7 +554,7 @@
               <div class="next-level">${nextTitle}</div>`;
           } else {
             title = `${category}: Unachieved`;
-            imageUrl = "http://127.0.0.1:5500/images/placeholder.png";
+            imageUrl = "placeholder.png";
             progressHtml = `
               <div class="progress-text">${stats[category]}/N/A</div>
               <div class="progress-bar-container">
@@ -624,7 +624,7 @@
 
       const captainStatusCard = document.createElement("div");
       captainStatusCard.className = "achievement-card";
-      const captainStatusImage = isActiveCaptain ? "http://127.0.0.1:5500/images/CAPYES.png" : "http://127.0.0.1:5500/images/CAPNO.png";
+      const captainStatusImage = isActiveCaptain ? "CAPYES.png" : "CAPNO.png";
       captainStatusCard.innerHTML = `
         <span class="achievement-title">Captain’s Armband</span><br>
         <img src="${captainStatusImage}" alt="Captain’s Armband ${isActiveCaptain ? 'Active' : 'Inactive'}" style="max-width:140px;"><br>
@@ -674,8 +674,8 @@
       let tbody = document.getElementById("individualLeaderboard").querySelector("tbody");
       tbody.innerHTML = individuals.map((i, index) => {
         let icon = '';
-        if (index === 0) icon = '<img src="http://127.0.0.1:5500/images/trophy.png" alt="Trophy" style="max-width: 20px; height: auto; vertical-align: middle; margin-right: 5px;" onerror="this.outerHTML=\'🏆\'">';
-        if (i.id === currentUserId) icon += '<img src="http://127.0.0.1:5500/images/user.png" alt="Current User" style="max-width: 20px; height: auto; vertical-align: middle; margin-right: 5px;" onerror="this.outerHTML=\'👤\'">';
+        if (index === 0) icon = '<img src="trophy.png" alt="Trophy" style="max-width: 20px; height: auto; vertical-align: middle; margin-right: 5px;" onerror="this.outerHTML=\'🏆\'">';
+        if (i.id === currentUserId) icon += '<img src="user.png" alt="Current User" style="max-width: 20px; height: auto; vertical-align: middle; margin-right: 5px;" onerror="this.outerHTML=\'👤\'">';
         return `<tr><td>${index + 1}</td><td>${icon}${i.Name} (${i.Uni})</td><td>£<span class="value">${i.Revenue.toFixed(2)}</span></td><td><span class="value">${i.Sales}</span></td></tr>`;
       }).join("");
 
@@ -685,12 +685,12 @@
         uniBoard[i.Uni].Revenue += i.Revenue;
         uniBoard[i.Uni].Sales += i.Sales;
       });
-      let unis = Object.entries(uniBoard).map(([uni, data]) => ({ Uni: uni, ...data }));
+      let unis = Object.entries(uniBoard).map(([uni, data]) => ({ Uni: uni, ...data}));
       unis.sort((a, b) => b.Revenue - a.Revenue);
       tbody = document.getElementById("universityLeaderboard").querySelector("tbody");
       tbody.innerHTML = unis.map((u, index) => {
         let icon = '';
-        if (index === 0) icon = '<img src="http://127.0.0.1:5500/images/trophy.png" alt="Trophy" style="max-width: 20px; height: auto; vertical-align: middle; margin-right: 5px;" onerror="this.outerHTML=\'🏆\'">';
+        if (index === 0) icon = '<img src="trophy.png" alt="Trophy" style="max-width: 20px; height: auto; vertical-align: middle; margin-right: 5px;" onerror="this.outerHTML=\'🏆\'">';
         return `<tr><td>${index + 1}</td><td>${icon}${u.Uni}</td><td>£<span class="value">${u.Revenue.toFixed(2)}</span></td><td><span class="value">${u.Sales}</span></td></tr>`;
       }).join("");
     }
@@ -708,10 +708,16 @@
           if (startStr?.startsWith("Date(")) {
             const startMatch = startStr.match(/Date\((\d+),(\d+),(\d+)\)/);
             if (startMatch) start = new Date(startMatch[1], startMatch[2], startMatch[3]);
+          } else if (startStr) {
+            const startParts = startStr.split("/");
+            start = new Date(startParts[2], startParts[1] - 1, startParts[0]);
           }
           if (endStr?.startsWith("Date(")) {
             const endMatch = endStr.match(/Date\((\d+),(\d+),(\d+)\)/);
             if (endMatch) end = new Date(endMatch[1], endMatch[2], endMatch[3]);
+          } else if (endStr) {
+            const endParts = endStr.split("/");
+            end = new Date(endParts[2], endParts[1] - 1, endParts[0]);
           }
           if (row.c[3]?.v === currentUser.University && now >= start && now <= end) {
             const option = document.createElement("option");
