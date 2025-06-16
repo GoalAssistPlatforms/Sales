@@ -856,6 +856,7 @@
         document.getElementById("loginPage").style.display = "flex";
         document.getElementById("userIdInput").value = "";
         document.getElementById("passwordInput").value = "";
+        document.getElementById("loginError").style.display = "none";
       },
       updateDashboardAndProgressBars: (timeframe) => Promise.all([updateDashboardMetrics(timeframe), updateAchievements()]),
       updateLeaderboards,
