@@ -236,7 +236,7 @@
     }
 
     async function getDateRange(timeframe) {
-      let now = new Date("2025-02-25");
+      let now = new Date();
       const paydayData = await fetchData("Payday");
       if (paydayData?.table?.rows[0]?.c[0]?.v) {
         const dateStr = paydayData.table.rows[0].c[0].v;
@@ -392,7 +392,7 @@
               const parts = dateStr.split("/");
               d = new Date(parts[2], parts[1] - 1, parts[0]);
             }
-            if (d <= new Date("2025-02-25")) {
+            if (d <= new Date()) {
               stats.MAP++;
               stats.ENG += parseInt(row.c[5]?.v) || 0;
             }
@@ -411,7 +411,7 @@
               const parts = dateStr.split("/");
               d = new Date(parts[2], parts[1] - 1, parts[0]);
             }
-            if (d <= new Date("2025-02-25")) {
+            if (d <= new Date()) {
               stats.SAO += parseInt(row.c[4]?.v) || 0;
             }
           }
@@ -429,7 +429,7 @@
               const parts = dateStr.split("/");
               d = new Date(parts[2], parts[1] - 1, parts[0]);
             }
-            if (d <= new Date("2025-02-25")) {
+            if (d <= new Date()) {
               stats.NSM++;
               stats.SAR += parseFloat(row.c[2]?.v) || 0;
             }
@@ -573,7 +573,7 @@
       });
 
       const paydayData = await fetchData("Payday");
-      let today = new Date("2025-02-25");
+      let today = new Date();
       if (paydayData?.table?.rows[0]?.c[0]?.v) {
         const dateStr = paydayData.table.rows[0].c[0].v;
         if (dateStr.startsWith("Date(")) {
@@ -699,7 +699,7 @@
       const scriptsData = await fetchData("OutreachScripts");
       const select = document.getElementById("outreachScript");
       select.innerHTML = '<option value="">Select Outreach Script</option>';
-      const now = new Date("2025-02-25");
+      const now = new Date();
       if (scriptsData?.table?.rows && currentUser) {
         scriptsData.table.rows.forEach(row => {
           const startStr = row.c[0]?.v;
@@ -747,7 +747,7 @@
       const postEngagement = document.getElementById("postEngagement").value;
       const outreachAttempts = document.getElementById("outreachAttempts").value;
       const scriptId = document.getElementById("outreachScript").value;
-      const date = new Date("2025-02-25").toLocaleDateString("en-GB");
+      const date = new Date().toLocaleDateString("en-GB");
       const report = {
         Marketing: postLink ? { SalesRep_ID: currentUserId, Name: currentUser.Name, Uni: currentUser.University, Date: date, Post_Link: postLink, Engagement: postEngagement } : null,
         Outreach: outreachAttempts ? { Date: date, SalesRep_ID: currentUserId, Name: currentUser.Name, Uni: currentUser.University, Outreach: outreachAttempts, Script_ID: scriptId } : null
