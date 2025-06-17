@@ -89,18 +89,6 @@
       line-height: 1.5;
     }
     #reportsTab .placeholder { color: #f7b91c; font-weight: bold; }
-    #reportsTab .copy-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: #f7b91c;
-      color: #1e1e1e;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
     #reportsTab .performance { color: #f7b91c; }
     #reportsTab p { margin-bottom: 0; }
     #reportsTab hr { border: 1px solid #444; margin: 15px 0; }
@@ -201,7 +189,6 @@
         <div>
           <h3 style="margin-top: 20px;">Active Scripts</h3>
           <div class="script-block">
-            <button type="button" class="copy-btn" onclick="copyScript(this)">Copy</button>
             <span class="script-type">Cold Script </span>
             <div class="script-item">S001C</div>
             <div class="script-item performance">Conversion: 0.98%, Number of outreaches per sale: 113</div>
@@ -213,7 +200,6 @@
           </div>
           <hr>
           <div class="script-block">
-            <button type="button" class="copy-btn" onclick="copyScript(this)">Copy</button>
             <span class="script-type">Warm Script </span>
             <div class="script-item">S003W</div>
             <div class="script-item performance">Conversion: 0.63%, Number of outreaches per sale: 160</div>
@@ -814,14 +800,6 @@ function showToast(message) {
   setTimeout(() => toast.style.display = "none", 3000);
 }
 
-function copyScript(btn) {
-  const script = btn.parentElement.querySelector('.script-text');
-  if (script) {
-    navigator.clipboard.writeText(script.innerText).then(() => {
-      showToast('Script copied!');
-    });
-  }
-}
 
     document.addEventListener("DOMContentLoaded", () => {
       const loginForm = document.getElementById("loginForm");
