@@ -70,10 +70,37 @@
     }
     #reportsTab { margin-top: 20px; }
     #reportsTab h3 { font-size: 18px; margin-bottom: 10px; }
-    #reportsTab .script-block { font-size: 16px; margin-bottom: 20px; padding: 12px; background: #2d2d2d; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); }
+    #reportsTab .script-block {
+      font-size: 16px;
+      margin-bottom: 20px;
+      padding: 16px;
+      background: #3a3a3a;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
     #reportsTab .script-type { font-weight: bold; font-size: 18px; }
     #reportsTab .script-item { margin-left: 20px; }
-    #reportsTab .script-text { margin-top: 10px; color: #fff; }
+    #reportsTab .script-text {
+      margin-top: 10px;
+      color: #fff;
+      font-family: monospace;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+    #reportsTab .placeholder { color: #f7b91c; font-weight: bold; }
+    #reportsTab .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #f7b91c;
+      color: #1e1e1e;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
     #reportsTab .performance { color: #f7b91c; }
     #reportsTab p { margin-bottom: 0; }
     #reportsTab hr { border: 1px solid #444; margin: 15px 0; }
@@ -174,24 +201,26 @@
         <div>
           <h3 style="margin-top: 20px;">Active Scripts</h3>
           <div class="script-block">
+            <button type="button" class="copy-btn" onclick="copyScript(this)">Copy</button>
             <span class="script-type">Cold Script </span>
             <div class="script-item">S001C</div>
             <div class="script-item performance">Conversion: 0.98%, Number of outreaches per sale: 113</div>
-            <div class="script-text">Hi [Lead Name], I hope you're doing well. My name is [X], and I'm a X-year student at X University, currently studying [X] and building my football industry network. I recently joined Goal Assist's Football Business Community, and I think it could be a great opportunity for you too. It's a space where football professionals and aspiring industry leaders connect, learn, and share insights. [Insert Link] There are loads of great people involved, and it's been really valuable for me already. If you're interested, I've got a referral code that saves you 10% on membership: [Your Cold Discount Code] Even if you don't want to join the full community, the code also works for any individual courses you might want to check out. Let me know if you have any questions—would be great to have you in there! Best, [X]</div>
+            <pre class="script-text">Hi <span class="placeholder">[Lead Name]</span>, I hope you're doing well. My name is <span class="placeholder">[X]</span>, and I'm a X-year student at X University, currently studying <span class="placeholder">[X]</span> and building my football industry network. I recently joined Goal Assist's Football Business Community, and I think it could be a great opportunity for you too. It's a space where football professionals and aspiring industry leaders connect, learn, and share insights. <span class="placeholder">[Insert Link]</span> There are loads of great people involved, and it's been really valuable for me already. If you're interested, I've got a referral code that saves you 10% on membership: <span class="placeholder">[Your Cold Discount Code]</span> Even if you don't want to join the full community, the code also works for any individual courses you might want to check out. Let me know if you have any questions—would be great to have you in there! Best, <span class="placeholder">[X]</span></pre>
             <div class="script-item" style="margin-top: 10px;">
               <span class="script-type">Cold Discount Code: </span><span id="coldDiscountCode"></span>
-              <div class="script-text">Use this code for Cold leads to offer a 10% discount. Share it with your referrals!</div>
+              <pre class="script-text">Use this code for Cold leads to offer a 10% discount. Share it with your referrals!</pre>
             </div>
           </div>
           <hr>
           <div class="script-block">
+            <button type="button" class="copy-btn" onclick="copyScript(this)">Copy</button>
             <span class="script-type">Warm Script </span>
             <div class="script-item">S003W</div>
             <div class="script-item performance">Conversion: 0.63%, Number of outreaches per sale: 160</div>
-            <div class="script-text">Hi [Lead Name], I hope you're doing well. Thanks for [liking/commenting/sharing] my post about [topic of post]! I recently joined Goal Assist's Football Business Community, and I think it could be a great opportunity for you too. It's a space where football professionals and aspiring industry leaders connect, learn, and share insights. [Insert Link] There are loads of great people involved, and it's been really valuable for me already. If you're interested, I've got a referral code that saves you 10% on membership: [Your Warm Discount Code] Even if you don't want to join the full community, the code also works for any individual courses you might want to check out. Let me know if you have any questions—would be great to have you in there! Best, [X]</div>
+            <pre class="script-text">Hi <span class="placeholder">[Lead Name]</span>, I hope you're doing well. Thanks for <span class="placeholder">[liking/commenting/sharing]</span> my post about <span class="placeholder">[topic of post]</span>! I recently joined Goal Assist's Football Business Community, and I think it could be a great opportunity for you too. It's a space where football professionals and aspiring industry leaders connect, learn, and share insights. <span class="placeholder">[Insert Link]</span> There are loads of great people involved, and it's been really valuable for me already. If you're interested, I've got a referral code that saves you 10% on membership: <span class="placeholder">[Your Warm Discount Code]</span> Even if you don't want to join the full community, the code also works for any individual courses you might want to check out. Let me know if you have any questions—would be great to have you in there! Best, <span class="placeholder">[X]</span></pre>
             <div class="script-item" style="margin-top: 10px;">
               <span class="script-type">Warm Discount Code: </span><span id="warmDiscountCode"></span>
-              <div class="script-text">Use this code for Warm leads to offer a 10% discount. Share it with your referrals!</div>
+              <pre class="script-text">Use this code for Warm leads to offer a 10% discount. Share it with your referrals!</pre>
             </div>
           </div>
         </div>
@@ -728,12 +757,12 @@
 
             if (row.c[5]?.v.toLowerCase() === "cold" && scriptBlocks[0]) {
               scriptBlocks[0].querySelector('.script-type').textContent = "Cold Script";
-              scriptBlocks[0].querySelector('.script-item:nth-child(2)').textContent = row.c[4]?.v;
+              scriptBlocks[0].querySelectorAll('.script-item')[0].textContent = row.c[4]?.v;
               scriptBlocks[0].querySelector('.performance').textContent = `Conversion: ${((parseFloat(row.c[9]?.v) || 0) * 100).toFixed(2)}%, Number of outreaches per sale: ${((parseFloat(row.c[9]?.v) || 0) > 0 ? Math.round(1 / (parseFloat(row.c[9]?.v) || 0)) : 0)}`;
               scriptBlocks[0].querySelector('.script-text').textContent = row.c[6]?.v;
             } else if (row.c[5]?.v.toLowerCase() === "warm" && scriptBlocks[1]) {
               scriptBlocks[1].querySelector('.script-type').textContent = "Warm Script";
-              scriptBlocks[1].querySelector('.script-item:nth-child(2)').textContent = row.c[4]?.v;
+              scriptBlocks[1].querySelectorAll('.script-item')[0].textContent = row.c[4]?.v;
               scriptBlocks[1].querySelector('.performance').textContent = `Conversion: ${((parseFloat(row.c[9]?.v) || 0) * 100).toFixed(2)}%, Number of outreaches per sale: ${((parseFloat(row.c[9]?.v) || 0) > 0 ? Math.round(1 / (parseFloat(row.c[9]?.v) || 0)) : 0)}`;
               scriptBlocks[1].querySelector('.script-text').textContent = row.c[6]?.v;
             }
@@ -778,12 +807,21 @@
       }
     }
 
-    function showToast(message) {
-      const toast = document.getElementById("toast");
-      toast.textContent = message;
-      toast.style.display = "block";
-      setTimeout(() => toast.style.display = "none", 3000);
-    }
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.style.display = "block";
+  setTimeout(() => toast.style.display = "none", 3000);
+}
+
+function copyScript(btn) {
+  const script = btn.parentElement.querySelector('.script-text');
+  if (script) {
+    navigator.clipboard.writeText(script.innerText).then(() => {
+      showToast('Script copied!');
+    });
+  }
+}
 
     document.addEventListener("DOMContentLoaded", () => {
       const loginForm = document.getElementById("loginForm");
