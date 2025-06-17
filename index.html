@@ -699,6 +699,7 @@
       const scriptsData = await fetchData("OutreachScripts");
       const select = document.getElementById("outreachScript");
       select.innerHTML = '<option value="">Select Outreach Script</option>';
+      const scriptBlocks = document.querySelectorAll('#reportsTab .script-block');
       const now = new Date();
       if (scriptsData?.table?.rows && currentUser) {
         scriptsData.table.rows.forEach(row => {
@@ -725,16 +726,16 @@
             option.textContent = `${row.c[5]?.v}: ${row.c[4]?.v}`;
             select.appendChild(option);
 
-            if (row.c[5]?.v.toLowerCase() === "cold") {
-              document.querySelector("#reportsTab .script-block:nth-child(2) .script-type").textContent = "Cold Script";
-              document.querySelector("#reportsTab .script-block:nth-child(2) .script-item:nth-child(2)").textContent = row.c[4]?.v;
-              document.querySelector("#reportsTab .script-block:nth-child(2) .performance").textContent = `Conversion: ${((parseFloat(row.c[9]?.v) || 0) * 100).toFixed(2)}%, Number of outreaches per sale: ${((parseFloat(row.c[9]?.v) || 0) > 0 ? Math.round(1 / (parseFloat(row.c[9]?.v) || 0)) : 0)}`;
-              document.querySelector("#reportsTab .script-block:nth-child(2) .script-text").textContent = row.c[6]?.v;
-            } else if (row.c[5]?.v.toLowerCase() === "warm") {
-              document.querySelector("#reportsTab .script-block:nth-child(3) .script-type").textContent = "Warm Script";
-              document.querySelector("#reportsTab .script-block:nth-child(3) .script-item:nth-child(2)").textContent = row.c[4]?.v;
-              document.querySelector("#reportsTab .script-block:nth-child(3) .performance").textContent = `Conversion: ${((parseFloat(row.c[9]?.v) || 0) * 100).toFixed(2)}%, Number of outreaches per sale: ${((parseFloat(row.c[9]?.v) || 0) > 0 ? Math.round(1 / (parseFloat(row.c[9]?.v) || 0)) : 0)}`;
-              document.querySelector("#reportsTab .script-block:nth-child(3) .script-text").textContent = row.c[6]?.v;
+            if (row.c[5]?.v.toLowerCase() === "cold" && scriptBlocks[0]) {
+              scriptBlocks[0].querySelector('.script-type').textContent = "Cold Script";
+              scriptBlocks[0].querySelector('.script-item:nth-child(2)').textContent = row.c[4]?.v;
+              scriptBlocks[0].querySelector('.performance').textContent = `Conversion: ${((parseFloat(row.c[9]?.v) || 0) * 100).toFixed(2)}%, Number of outreaches per sale: ${((parseFloat(row.c[9]?.v) || 0) > 0 ? Math.round(1 / (parseFloat(row.c[9]?.v) || 0)) : 0)}`;
+              scriptBlocks[0].querySelector('.script-text').textContent = row.c[6]?.v;
+            } else if (row.c[5]?.v.toLowerCase() === "warm" && scriptBlocks[1]) {
+              scriptBlocks[1].querySelector('.script-type').textContent = "Warm Script";
+              scriptBlocks[1].querySelector('.script-item:nth-child(2)').textContent = row.c[4]?.v;
+              scriptBlocks[1].querySelector('.performance').textContent = `Conversion: ${((parseFloat(row.c[9]?.v) || 0) * 100).toFixed(2)}%, Number of outreaches per sale: ${((parseFloat(row.c[9]?.v) || 0) > 0 ? Math.round(1 / (parseFloat(row.c[9]?.v) || 0)) : 0)}`;
+              scriptBlocks[1].querySelector('.script-text').textContent = row.c[6]?.v;
             }
           }
         });
